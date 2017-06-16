@@ -1,6 +1,10 @@
 extends layout
 
+block head
+  script(src="/javascripts/index.js")
+
 block content
-  h1= title
-  p Welcome to #{title}
-  test
+  section(class='row')
+    h1 LunchTime
+    p The fun way to solve the lunch debate
+    section(id='new-game-button')
