@@ -1,4 +1,4 @@
-$(document).ready(function() {
+/*$(document).ready(function() {
     class TimeInput extends React.Component {
         constructor(props) {
             super(props);
@@ -149,4 +149,33 @@ $(document).ready(function() {
     $("#new-game-button").each(function () {
         ReactDOM.render(<NewGameButton />, this);
     });
+});*/
+
+
+var restaurantSelections;
+
+$(() => {
+    restaurantSelections = (() => {
+        var restaurants = localStorage.getItem('game-restaurants');
+        if (restaurants == null) {
+            restaurants = [];
+        } else {
+            restaurants = JSON.parse(restaurants);
+        }
+
+        return new Vue({
+            el: '#restaurant-management',
+            data: {
+                restaurants: restaurants,
+                newName: ''
+            },
+            methods: {
+                addRestaurant: function() {
+                    restaurantSelections.restaurants.push({name: restaurantSelections.newName});
+                    restaurantSelections.newName = '';
+                    localStorage.setItem('game-restaurants', JSON.stringify(restaurantSelections.restaurants));
+                }
+            }
+        })
+    })();
 });

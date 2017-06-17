@@ -7,4 +7,23 @@ block content
   section(class='row')
     h1 LunchTime
     p The fun way to solve the lunch debate
-    section(id='new-game-button')
+    button(class='btn btn-primary' data-toggle='modal' data-target='#bs-example-modal-sm') New Game
+    section(id='bs-example-modal-sm' class='modal fade' tabindex='-1' role='dialog' aria-labelledby='mySmallModalLabel')
+      div(class="modal-dialog modal-md" role="document")
+        div(class='modal-content')
+          div(class='modal-header')
+            h4 Create Game
+          div(class='modal-body')
+            div(class="row", id='restaurant-management')
+              div(class="col-lg-4") Restaurants
+              div(class="col-lg-8")
+                div
+                  input(type="text", v-model='newName')
+                  button(class='btn btn-success', 'v-on:click'='addRestaurant') Add
+                div
+                  div(v-for='restaurant in restaurants')
+                    span {{restaurant.name}} &nbsp;
+                    span x
+          div(class='modal-footer')
+            button(class='btn btn-default' data-dismiss='modal') Close
+            button(class='btn btn-primary') Create Game
