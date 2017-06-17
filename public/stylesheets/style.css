@@ -6,3 +6,11 @@ body {
 a {
   color: #00B7FF;
 }
+
+#lunch-time .hour {
+  width: 20%;
+}
+
+#lunch-time .minute {
+  width: 20%;
+}

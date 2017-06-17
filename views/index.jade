@@ -22,8 +22,14 @@ block content
                   button(class='btn btn-success', 'v-on:click'='addRestaurant') Add
                 div
                   div(v-for='restaurant in restaurants')
-                    span {{restaurant.name}} &nbsp;
-                    span x
-          div(class='modal-footer')
+                    span(class='col-lg-8') {{restaurant.name}} &nbsp;
+                    button(class='btn btn-danger', 'v-on:click'='removeRestaurant(restaurant)') Remove
+            div(class="row", id='lunch-time')
+              div(class='col-lg-4') Time
+              div(class='col-lg-8')
+                div
+                  input(class='hour', type='number', v-model='hour', min='1', max='12')
+                  input(class='minute', type='number', v-model='minute', min='0', max='59')
+          div(class='modal-footer', id='create-game-footer')
             button(class='btn btn-default' data-dismiss='modal') Close
-            button(class='btn btn-primary') Create Game
+            button(class='btn btn-primary', 'v-on:click'='createGame') Create Game
