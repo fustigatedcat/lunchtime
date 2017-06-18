@@ -1,4 +1,5 @@
 var startGameButton;
+var playerList;
 
 window.onload = () => {
     startGameButton = (() => {
@@ -16,6 +17,15 @@ window.onload = () => {
             }
         });
     })();
+
+    playerList = (() => {
+        return new Vue({
+            el: '#player-list',
+            data: {
+                players: []
+            }
+        });
+    })();
     
     axios.get('/api/games/' + gameName, {
         params: {
@@ -25,7 +35,18 @@ window.onload = () => {
     }).then(response => {
         if(response.data.isOwner) {
             startGameButton.isDisabled = response.data.isGameStarted;
+            playerList.players = response.data.players;
         }
+        setInterval(() => {
+            axios.get('/api/games/' + gameName, {
+                params: {
+                    uuid: myUser.uuid,
+                    state: 'update'
+                }
+            }).then(response => {
+                playerList.players = response.data.players;
+            });
+        }, 1000);
         console.log(response.data);
-    })
+    });
 };

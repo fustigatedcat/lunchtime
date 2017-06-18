@@ -3,13 +3,24 @@ extends layout
 block head
     script(src="/javascripts/game.js")
     script= 'var gameName = \'' + game.name + '\';'
+    title= 'Game ' + game.name
 
 block content
     section(class='row')
-        section(class='col-lg-3', id='start-game-button')
+        div(class='col-lg-3', id='start-game-button')
             button(class='btn btn-primary', ':disabled'='isDisabled', 'v-on:click'='startGame') Start Game
-        section(class='col-lg-6 text-center')
+        div(class='col-lg-6 text-center')
             h1= 'Lunch Time [' + game.lunch_hour + ':' + game.lunch_minute + ']'
-        section(class='col-lg-3 text-right')
+        div(class='col-lg-3 text-right')
             p Link Share
             span= 'http://localhost:3000/games/' + game.name
+    section(class='row')
+        div(class='col-lg-5')
+        div(class='col-lg-5')
+        div(class='col-lg-2 text-right', id='player-list')
+            h3 Players
+            hr
+            div(v-for='player in players')
+                h4
+                    span(class='glyphicon glyphicon-glass', v-if='player.is_turn')
+                    span {{player.name}}

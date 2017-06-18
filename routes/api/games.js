@@ -16,25 +16,42 @@ router.post('/', function(req, res, next) {
 });
 
 router.get('/:name', function(req, res, next) {
-    if(req.param('state') == null || req.param('state') == 'initial') {
-        userDAO.getUser(req.param('uuid'), function(err, user) {
+    userDAO.getUser(req.param('uuid'), function(err, user) {
+        if(err) {
+            console.log(err);
+            return res.status(500).send();
+        }
+        gameDAO.getGame(req.params.name, function(err, game) {
             if(err) {
                 console.log(err);
                 return res.status(500).send();
             }
-            gameDAO.getGame(req.params.name, function(err, game) {
+            gameDAO.getPlayersForGame(game, function(err, playerList) {
                 if(err) {
                     console.log(err);
                     return res.status(500).send();
                 }
-                res.send({
-                    isOwner: game['created_by'] == user.id,
-                    isGameStarted: game.started == 0 ? false : game.started
-                });    
-            }); 
+                if(req.param('state') == null || req.param('state') == 'initial') {
+                    gameDAO.addUserToGame(game, user, function (err, _) {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).send();
+                        }
+                        res.send({
+                            isOwner: game['created_by'] == user.id,
+                            isGameStarted: game.started == 0 ? false : game.started,
+                            players: playerList
+                        });
+                    });
+                } else {
+                    res.send({
+                        isGameStarted: game.started == 0 ? false : game.started,
+                        players: playerList
+                    });
+                }
+            });
         });
-        
-    }
+    });
 });
 
 module.exports = router;
