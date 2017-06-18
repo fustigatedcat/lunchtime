@@ -23,6 +23,7 @@ app.use('/', require('./routes/index'));
 app.use('/users', require('./routes/users'));
 app.use('/api/games', require('./routes/api/games'));
 app.use('/api/users', require('./routes/api/users'));
+app.use('/games', require('./routes/games'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

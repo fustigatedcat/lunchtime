@@ -2,7 +2,7 @@ var restaurantSelections;
 var timeSelection;
 var createGameButton;
 
-$(() => {
+window.onload = () => {
     restaurantSelections = (() => {
         var restaurants = localStorage.getItem('game-restaurants');
         if (restaurants == null) {
@@ -54,7 +54,7 @@ $(() => {
                         },
                         creator: myUser.uuid
                     }).then(response => {
-                        window.location = '/games/' + response.data['game-id'];
+                        window.location = '/games/' + response.data.name;
                     }).catch(response => {
                         console.log(response);
                     });
@@ -62,14 +62,4 @@ $(() => {
             }
         })
     })();
-});
-
-var myUser = localStorage.getItem('my-user');
-if(myUser == null) {
-    axios.post('/api/users', {}).then(response => {
-        myUser = response.data;
-        localStorage.setItem('my-user', JSON.stringify(myUser));
-    });
-} else {
-    myUser = JSON.parse(myUser);
-}
+};

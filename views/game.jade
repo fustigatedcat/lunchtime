@@ -1,0 +1,15 @@
+extends layout
+
+block head
+    script(src="/javascripts/game.js")
+    script= 'var gameName = \'' + game.name + '\';'
+
+block content
+    section(class='row')
+        section(class='col-lg-3', id='start-game-button')
+            button(class='btn btn-primary', ':disabled'='isDisabled', 'v-on:click'='startGame') Start Game
+        section(class='col-lg-6 text-center')
+            h1= 'Lunch Time [' + game.lunch_hour + ':' + game.lunch_minute + ']'
+        section(class='col-lg-3 text-right')
+            p Link Share
+            span= 'http://localhost:3000/games/' + game.name
