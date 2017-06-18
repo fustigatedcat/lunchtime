@@ -11,8 +11,13 @@ window.onload = () => {
             },
             methods: {
                 startGame: function() {
-                    startGameButton.isDisabled = true;
-                    alert('Starting game ' + gameName);
+                    axios.post('/api/games/' + gameName + '/start', {
+                        uuid: myUser.uuid
+                    }).then(_ => {
+                        startGameButton.isDisabled = true;
+                    }).catch(ex => {
+                        alert(ex);
+                    });
                 }
             }
         });

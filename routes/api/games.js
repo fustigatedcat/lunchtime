@@ -15,6 +15,45 @@ router.post('/', function(req, res, next) {
     });
 });
 
+router.post('/:name/start', function(req, res, next) {
+    userDAO.getUser(req.body.uuid, function(err, user) {
+        if(err) {
+            console.log(err);
+            return res.status(500).send();
+        }
+        gameDAO.getGame(req.params.name, function(err, game) {
+            if(err) {
+                console.log(err);
+                return res.status(500).send();
+            }
+            if(game['created_by'] == user.id) {
+                gameDAO.startGame(game, function(err, _) {
+                    if(err) {
+                        console.log(err);
+                        return res.status(500).send();
+                    }
+                    gameDAO.getPlayersForGame(game, function(err, players) {
+                        if(err) {
+                            console.log(err);
+                            return res.status(500).send();
+                        }
+                        var index = Math.floor(Math.random()*(players.length));
+                        gameDAO.setPlayersTurn(game, players[index], function(err, _) {
+                            if(err) {
+                                console.log(err);
+                                return res.status(500).send();
+                            }
+                            res.status(200).send();
+                        });
+                    });
+                });
+            } else {
+                return res.status(403).send();
+            }
+        });
+    });
+});
+
 router.get('/:name', function(req, res, next) {
     userDAO.getUser(req.param('uuid'), function(err, user) {
         if(err) {
@@ -31,6 +70,9 @@ router.get('/:name', function(req, res, next) {
                     console.log(err);
                     return res.status(500).send();
                 }
+                var myTurn = false;
+                playerList.forEach(function(p) { if(p.id == user.id) { myTurn = p.is_turn; }})
+                playerList.forEach(function(p) { delete p.id; });
                 if(req.param('state') == null || req.param('state') == 'initial') {
                     gameDAO.addUserToGame(game, user, function (err, _) {
                         if (err) {
@@ -40,13 +82,15 @@ router.get('/:name', function(req, res, next) {
                         res.send({
                             isOwner: game['created_by'] == user.id,
                             isGameStarted: game.started == 0 ? false : game.started,
-                            players: playerList
+                            players: playerList,
+                            myTurn: myTurn
                         });
                     });
                 } else {
                     res.send({
                         isGameStarted: game.started == 0 ? false : game.started,
-                        players: playerList
+                        players: playerList,
+                        myTurn: myTurn
                     });
                 }
             });
