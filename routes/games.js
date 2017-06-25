@@ -11,6 +11,8 @@ router.get('/:name', function(req, res, next) {
             // render the error page
             res.status(404);
             res.render('error');
+        } else if(!game) {
+            res.status(404).send();
         } else {
             res.render('game', {game: game});
         }

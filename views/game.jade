@@ -10,7 +10,7 @@ block content
         div(class='col-lg-3', id='start-game-button')
             button(class='btn btn-primary', ':disabled'='isDisabled', 'v-on:click'='startGame') Start Game
         div(class='col-lg-6 text-center')
-            h1= 'Lunch Time [' + game.lunch_hour + ':' + game.lunch_minute + ']'
+            h1= 'Lunch Time [' + game.time.hour + ':' + game.time.minute + ']'
         div(class='col-lg-3 text-right')
             p Link Share
             span= 'http://localhost:3000/games/' + game.name
@@ -26,7 +26,7 @@ block content
                     span(class='glyphicon glyphicon-glass', v-if='myTurn')
                     span(v-if='myTurn') Pick a Card
                     span(v-if='!myTurn') Wait...
-                div(class='card pull-left', v-for='card in cards')
+                div(class='card pull-left', v-for='card in cards', 'v-on:click'='play(card)')
                     h4 {{card.name}}
                 div(class='clearfix')
         div(class='col-lg-2 text-right', id='player-list')

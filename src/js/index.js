@@ -51,9 +51,8 @@ window.onload = () => {
                         time: {
                             hour: timeSelection.hour,
                             minute: timeSelection.minute
-                        },
-                        creator: myUser.uuid
-                    }).then(response => {
+                        }
+                    }, {headers: {uuid: myUser.uuid}}).then(response => {
                         window.location = '/games/' + response.data.name;
                     }).catch(response => {
                         console.log(response);

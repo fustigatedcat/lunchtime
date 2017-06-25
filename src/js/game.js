@@ -49,35 +49,51 @@ window.onload = () => {
             data: {
                 cards: [],
                 myTurn: false
+            },
+            methods: {
+                play: function(card) {
+                    if(myTurn) {
+                        axios.post('/api/games/' + gameName + '/play', {
+                            uuid: myUser.uuid,
+                            card: card.id
+                        }).then(response => {
+                            currentCard.name = card.name;
+                            myCardList.cards = myCardList.cards.filter(f => f.id != card.id);
+                            myCardList.myTurn = false;
+                        });
+                    }
+                }
             }
         });
     })();
     
     axios.get('/api/games/' + gameName, {
         params: {
-            uuid: myUser.uuid,
             state: 'initial'
+        },
+        headers: {
+            uuid: myUser.uuid
         }
     }).then(response => {
         if(response.data.isOwner) {
             startGameButton.isDisabled = response.data.isGameStarted;
         }
-        currentCard.name = 'El Cerro Grande';
+        currentCard.name = response.data.currentCardName;
         playerList.players = response.data.players;
         myCardList.cards = response.data.myCards;
         myCardList.myTurn = response.data.myTurn;
-        setInterval(() => {
+/*        setInterval(() => {
             axios.get('/api/games/' + gameName, {
                 params: {
                     uuid: myUser.uuid,
                     state: 'update'
                 }
             }).then(response => {
+                currentCard.name = response.data.currentCardName;
                 playerList.players = response.data.players;
                 myCardList.cards = response.data.myCards;
                 myCardList.myTurn = response.data.myTurn;
             });
-        }, 1000);
-        console.log(response.data);
+        }, 1000);*/
     });
 };
