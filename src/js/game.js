@@ -1,5 +1,7 @@
 var startGameButton;
 var playerList;
+var currentCard;
+var myCardList;
 
 window.onload = () => {
     startGameButton = (() => {
@@ -23,11 +25,30 @@ window.onload = () => {
         });
     })();
 
+    currentCard = (() => {
+        return new Vue({
+            el: '#current-card',
+            data: {
+                name: ''
+            }
+        })
+    })();
+
     playerList = (() => {
         return new Vue({
             el: '#player-list',
             data: {
                 players: []
+            }
+        });
+    })();
+
+    myCardList = (() => {
+        return new Vue({
+            el: '#my-cards',
+            data: {
+                cards: [],
+                myTurn: false
             }
         });
     })();
@@ -40,8 +61,11 @@ window.onload = () => {
     }).then(response => {
         if(response.data.isOwner) {
             startGameButton.isDisabled = response.data.isGameStarted;
-            playerList.players = response.data.players;
         }
+        currentCard.name = 'El Cerro Grande';
+        playerList.players = response.data.players;
+        myCardList.cards = response.data.myCards;
+        myCardList.myTurn = response.data.myTurn;
         setInterval(() => {
             axios.get('/api/games/' + gameName, {
                 params: {
@@ -50,6 +74,8 @@ window.onload = () => {
                 }
             }).then(response => {
                 playerList.players = response.data.players;
+                myCardList.cards = response.data.myCards;
+                myCardList.myTurn = response.data.myTurn;
             });
         }, 1000);
         console.log(response.data);

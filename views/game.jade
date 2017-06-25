@@ -17,6 +17,18 @@ block content
     section(class='row')
         div(class='col-lg-5')
         div(class='col-lg-5')
+            section(class='row', id='current-card')
+                h2 Current Card
+                div(class='card')
+                    h4 {{name}}
+            section(class='row', id='my-cards')
+                h2
+                    span(class='glyphicon glyphicon-glass', v-if='myTurn')
+                    span(v-if='myTurn') Pick a Card
+                    span(v-if='!myTurn') Wait...
+                div(class='card pull-left', v-for='card in cards')
+                    h4 {{card.name}}
+                div(class='clearfix')
         div(class='col-lg-2 text-right', id='player-list')
             h3 Players
             hr

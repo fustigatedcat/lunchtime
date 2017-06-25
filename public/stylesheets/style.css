@@ -14,3 +14,13 @@ a {
 #lunch-time .minute {
   width: 20%;
 }
+
+.card {
+  width: 100px;
+  height: 150px;
+  border: 1px solid grey;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  overflow-wrap: normal;
+}

@@ -37,13 +37,19 @@ router.post('/:name/start', function(req, res, next) {
                             console.log(err);
                             return res.status(500).send();
                         }
-                        var index = Math.floor(Math.random()*(players.length));
-                        gameDAO.setPlayersTurn(game, players[index], function(err, _) {
+                        gameDAO.createCardsForGame(game, players, function(err, _) {
                             if(err) {
                                 console.log(err);
                                 return res.status(500).send();
                             }
-                            res.status(200).send();
+                            var index = Math.floor(Math.random()*(players.length));
+                            gameDAO.setPlayersTurn(game, players[index], function(err, _) {
+                                if(err) {
+                                    console.log(err);
+                                    return res.status(500).send();
+                                }
+                                res.status(200).send();
+                            });
                         });
                     });
                 });
@@ -70,29 +76,37 @@ router.get('/:name', function(req, res, next) {
                     console.log(err);
                     return res.status(500).send();
                 }
-                var myTurn = false;
-                playerList.forEach(function(p) { if(p.id == user.id) { myTurn = p.is_turn; }})
-                playerList.forEach(function(p) { delete p.id; });
-                if(req.param('state') == null || req.param('state') == 'initial') {
-                    gameDAO.addUserToGame(game, user, function (err, _) {
-                        if (err) {
-                            console.log(err);
-                            return res.status(500).send();
-                        }
+                gameDAO.getAvailableCardsForUserAndGame(user, game, function(err, cards) {
+                    if(err) {
+                        console.log(err);
+                        return res.status(500).send();
+                    }
+                    var myTurn = false;
+                    playerList.forEach(function(p) { if(p.id == user.id) { myTurn = p.is_turn; }})
+                    playerList.forEach(function(p) { delete p.id; });
+                    if(req.param('state') == null || req.param('state') == 'initial') {
+                        gameDAO.addUserToGame(game, user, function (err, _) {
+                            if (err) {
+                                console.log(err);
+                                return res.status(500).send();
+                            }
+                            res.send({
+                                isOwner: game['created_by'] == user.id,
+                                isGameStarted: game.started == 0 ? false : game.started,
+                                players: playerList,
+                                myCards: cards,
+                                myTurn: myTurn
+                            });
+                        });
+                    } else {
                         res.send({
-                            isOwner: game['created_by'] == user.id,
                             isGameStarted: game.started == 0 ? false : game.started,
                             players: playerList,
+                            myCards: cards,
                             myTurn: myTurn
                         });
-                    });
-                } else {
-                    res.send({
-                        isGameStarted: game.started == 0 ? false : game.started,
-                        players: playerList,
-                        myTurn: myTurn
-                    });
-                }
+                    }
+                });
             });
         });
     });
