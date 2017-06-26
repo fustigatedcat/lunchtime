@@ -1,3 +1,0 @@
-USE lunchtime;
-
-ALTER TABLE GameUserMap ADD COLUMN is_turn BOOLEAN NOT NULL DEFAULT false;

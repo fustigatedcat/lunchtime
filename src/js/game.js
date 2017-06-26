@@ -13,8 +13,10 @@ window.onload = () => {
             },
             methods: {
                 startGame: function() {
-                    axios.post('/api/games/' + gameName + '/start', {
-                        uuid: myUser.uuid
+                    axios.post('/api/games/' + gameName + '/start', {}, {
+                        headers: {
+                            uuid: myUser.uuid
+                        }
                     }).then(_ => {
                         startGameButton.isDisabled = true;
                     }).catch(ex => {
@@ -82,11 +84,13 @@ window.onload = () => {
         playerList.players = response.data.players;
         myCardList.cards = response.data.myCards;
         myCardList.myTurn = response.data.myTurn;
-/*        setInterval(() => {
+        setInterval(() => {
             axios.get('/api/games/' + gameName, {
                 params: {
-                    uuid: myUser.uuid,
                     state: 'update'
+                },
+                headers: {
+                    uuid: myUser.uuid
                 }
             }).then(response => {
                 currentCard.name = response.data.currentCardName;
@@ -94,6 +98,6 @@ window.onload = () => {
                 myCardList.cards = response.data.myCards;
                 myCardList.myTurn = response.data.myTurn;
             });
-        }, 1000);*/
+        }, 1000);
     });
 };

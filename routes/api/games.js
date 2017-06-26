@@ -1,10 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var gameDAO = require('../../lib/GameDAO.js');
-var userDAO = require('../../lib/UserDAO.js');
 
-/* GET home page. */
-router.post('/', function(req, res, next) {
+router.post('/', function(req, res) {
     if(req.user != null) {
         gameDAO.createGame(req.body.restaurants, req.body.time, req.user, function(err, game) {
             if(err) {
@@ -19,49 +17,65 @@ router.post('/', function(req, res, next) {
     }
 });
 
-router.post('/:name/start', function(req, res, next) {
-    userDAO.getUser(req.body.uuid, function(err, user) {
-        if(err) {
-            console.log(err);
-            return res.status(500).send();
+function createCardArray(cards, multiplier) {
+    var newCards = [];
+    for(var card in cards) {
+        if(cards.hasOwnProperty(card)) {
+            for(var i = 0; i < multiplier; i++) {
+                newCards.push(cards[card]);
+            }
         }
+    }
+    return newCards;
+}
+
+function shuffleCards(cards) {
+    var j, x, i;
+    for (i = cards.length; i; i--) {
+        j = Math.floor(Math.random() * i);
+        x = cards[i - 1];
+        cards[i - 1] = cards[j];
+        cards[j] = x;
+    }
+}
+
+function dealCards(cards, players) {
+    var cardDealings = [];
+    var total = players.length * 3; // total number of cards to be dealt
+    for(var i = 0; i < total; i++) {
+        players[i%(players.length)].cards.push(cards[i]);
+    }
+    return cardDealings;
+}
+
+router.post('/:name/start', function(req, res) {
+    if(req.user != null) {
         gameDAO.getGame(req.params.name, function(err, game) {
             if(err) {
                 console.log(err);
                 return res.status(500).send();
             }
-            if(game['created_by'] == user.id) {
-                gameDAO.startGame(game, function(err, _) {
+            if(game.creator.equals(req.user._id)) {
+                game.started = true;
+                var cards = createCardArray(game.restaurants, Math.ceil(game.players.length * 3/game.restaurants.length));
+                for(var i = 0; i < 3; i++) { // shuffle 3 times for good measure
+                    shuffleCards(cards);
+                }
+                dealCards(cards, game.players);
+                var index = Math.floor(Math.random()*(game.players.length));
+                game.players[index].is_turn = true;
+                gameDAO.updateGame(game, function(err) {
                     if(err) {
                         console.log(err);
                         return res.status(500).send();
                     }
-                    gameDAO.getPlayersForGame(game, function(err, players) {
-                        if(err) {
-                            console.log(err);
-                            return res.status(500).send();
-                        }
-                        gameDAO.createCardsForGame(game, players, function(err, _) {
-                            if(err) {
-                                console.log(err);
-                                return res.status(500).send();
-                            }
-                            var index = Math.floor(Math.random()*(players.length));
-                            gameDAO.setPlayersTurn(game, players[index], function(err, _) {
-                                if(err) {
-                                    console.log(err);
-                                    return res.status(500).send();
-                                }
-                                res.status(200).send();
-                            });
-                        });
-                    });
+                    res.status(200).send();
                 });
             } else {
                 return res.status(403).send();
             }
         });
-    });
+    }
 });
 
 router.get('/:name', function(req, res) {
@@ -73,14 +87,13 @@ router.get('/:name', function(req, res) {
         } else if(!game) {
             return res.status(404).send();
         }
-        var myTurn = false;
-        game.players.forEach(function(p) { if(p._id.equals(req.user._id)) { myTurn = p.is_turn; }})
+        var myPlayer = game.players.filter(function(p) { return p._id.equals(req.user._id); });
         var cardName = '';
         var rtn = {
             isGameStarted: game.started == 0 ? false : game.started,
             players: game.players,
-            myCards: [],
-            myTurn: myTurn,
+            myCards: myPlayer[0].cards, // Need to populate this.
+            myTurn: myPlayer[0].is_turn,
             currentCardName: cardName
         };
         if(req.query.state == 'initial') {
@@ -90,94 +103,25 @@ router.get('/:name', function(req, res) {
                     return res.status(500).send();
                 }
                 rtn.isOwner = game.creator.equals(req.user._id);
-                game.players.forEach(function(p) { delete p._id; });
+                game.players.forEach(function(p) {
+                    delete p.cards;
+                    delete p._id;
+                });
                 res.send(rtn);
             });
         } else {
-            game.players.forEach(function(p) { delete p._id; });
+            game.players.forEach(function(p) {
+                delete p.cards;
+                delete p._id;
+            });
             res.send(rtn);
         }
 
     })
 });
 
-router.get('/:name', function(req, res, next) {
-    userDAO.getUser(req.param('uuid'), function(err, user) {
-        if(err) {
-            console.log(err);
-            return res.status(500).send();
-        }
-        gameDAO.getGame(req.params.name, function(err, game) {
-            if(err) {
-                console.log(err);
-                return res.status(500).send();
-            }
-            gameDAO.getPlayersForGame(game, function(err, playerList) {
-                if(err) {
-                    console.log(err);
-                    return res.status(500).send();
-                }
-                gameDAO.getAvailableCardsForUserAndGame(user, game, function(err, cards) {
-                    if(err) {
-                        console.log(err);
-                        return res.status(500).send();
-                    }
-                    gameDAO.getCurrentCard(game, function(err, card) {
-                        if(err) {
-                            console.log(err);
-                            return res.status(500).send();
-                        }
-                        var myTurn = false;
-                        playerList.forEach(function(p) { if(p.id == user.id) { myTurn = p.is_turn; }})
-                        playerList.forEach(function(p) { delete p.id; });
-                        var cardName = '';
-                        if(card.length == 1) {
-                            cardName = card[0].name;
-                        }
-                        if(req.param('state') == null || req.param('state') == 'initial') {
-                            gameDAO.addUserToGame(game, user, function (err, _) {
-                                if (err) {
-                                    console.log(err);
-                                    return res.status(500).send();
-                                }
-                                res.send({
-                                    isOwner: game['created_by'] == user.id,
-                                    isGameStarted: game.started == 0 ? false : game.started,
-                                    players: playerList,
-                                    myCards: cards,
-                                    myTurn: myTurn,
-                                    currentCardName: cardName
-                                });
-                            });
-                        } else {
-                            res.send({
-                                isGameStarted: game.started == 0 ? false : game.started,
-                                players: playerList,
-                                myCards: cards,
-                                myTurn: myTurn,
-                                currentCardName: cardName
-                            });
-                        }
-                    });
-                });
-            });
-        });
-    });
-});
-
+// Convert this!
 router.post('/:name/play', function(req, res) {
-    userDAO.getUser(req.param('uuid'), function(err, user) {
-        if (err) {
-            console.log(err);
-            return res.status(500).send();
-        }
-        gameDAO.getGame(req.params.name, function (err, game) {
-            if (err) {
-                console.log(err);
-                return res.status(500).send();
-            }
-        });
-    });
 });
 
 module.exports = router;
