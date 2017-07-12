@@ -92,8 +92,8 @@ router.get('/:name', function(req, res) {
         var rtn = {
             isGameStarted: game.started == 0 ? false : game.started,
             players: game.players,
-            myCards: myPlayer[0].cards, // Need to populate this.
-            myTurn: myPlayer[0].is_turn,
+            myCards: myPlayer.length == 0 ? [] : myPlayer[0].cards, // Need to populate this.
+            myTurn: myPlayer.length == 0 ? false : myPlayer[0].is_turn,
             currentCardName: cardName
         };
         if(req.query.state == 'initial') {

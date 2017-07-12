@@ -14,9 +14,6 @@ window.onload = () => {
             methods: {
                 startGame: function() {
                     axios.post('/api/games/' + gameName + '/start', {}, {
-                        headers: {
-                            uuid: myUser.uuid
-                        }
                     }).then(_ => {
                         startGameButton.isDisabled = true;
                     }).catch(ex => {
@@ -56,7 +53,6 @@ window.onload = () => {
                 play: function(card) {
                     if(myTurn) {
                         axios.post('/api/games/' + gameName + '/play', {
-                            uuid: myUser.uuid,
                             card: card.id
                         }).then(response => {
                             currentCard.name = card.name;
@@ -72,9 +68,6 @@ window.onload = () => {
     axios.get('/api/games/' + gameName, {
         params: {
             state: 'initial'
-        },
-        headers: {
-            uuid: myUser.uuid
         }
     }).then(response => {
         if(response.data.isOwner) {
@@ -88,9 +81,6 @@ window.onload = () => {
             axios.get('/api/games/' + gameName, {
                 params: {
                     state: 'update'
-                },
-                headers: {
-                    uuid: myUser.uuid
                 }
             }).then(response => {
                 currentCard.name = response.data.currentCardName;

@@ -52,7 +52,7 @@ window.onload = () => {
                             hour: timeSelection.hour,
                             minute: timeSelection.minute
                         }
-                    }, {headers: {uuid: myUser.uuid}}).then(response => {
+                    }).then(response => {
                         window.location = '/games/' + response.data.name;
                     }).catch(response => {
                         console.log(response);

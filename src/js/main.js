@@ -1,4 +1,4 @@
-var myUser = localStorage.getItem('my-user');
+/*var myUser = localStorage.getItem('my-user');
 if(myUser == null) {
     axios.post('/api/users', {}).then(response => {
         myUser = response.data;
@@ -6,4 +6,4 @@ if(myUser == null) {
     });
 } else {
     myUser = JSON.parse(myUser);
-}
+}*/
