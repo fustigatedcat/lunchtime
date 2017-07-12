@@ -12,7 +12,7 @@ window.onload = () => {
                 isGameOver: false
             }
         });
-    });
+    })();
 
     startGameButton = (() => {
 

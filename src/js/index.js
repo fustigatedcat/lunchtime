@@ -25,6 +25,7 @@ window.onload = () => {
                 },
                 removeRestaurant: function(r) {
                     restaurantSelections.restaurants = restaurantSelections.restaurants.filter(r2 => r2 != r);
+                    localStorage.setItem('game-restaurants', JSON.stringify(restaurantSelections.restaurants));
                 }
             }
         })
