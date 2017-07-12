@@ -9,8 +9,10 @@ block content
     section(class='row')
         div(class='col-lg-3', id='start-game-button')
             button(class='btn btn-primary', ':disabled'='isDisabled', 'v-on:click'='startGame') Start Game
-        div(class='col-lg-6 text-center')
+        div(class='col-lg-6 text-center', id='header')
             h1= 'Lunch Time [' + game.time.hour + ':' + game.time.minute + ']'
+                br
+                span(class='text-danger', v-if='isGameOver') Game Over!
         div(class='col-lg-3 text-right')
             p Link Share
             span= 'http://localhost:3000/games/' + game.name
@@ -28,6 +30,7 @@ block content
                     span(v-if='!myTurn') Wait...
                 div(class='card pull-left', v-for='card in cards', 'v-on:click'='play(card)')
                     h4 {{card}}
+                button(class='btn btn-info', 'v-on:click'='stay()', ':disabled'='!myTurn') Stay
                 div(class='clearfix')
         div(class='col-lg-2 text-right', id='player-list')
             h3 Players

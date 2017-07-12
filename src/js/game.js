@@ -2,8 +2,18 @@ var startGameButton;
 var playerList;
 var currentCard;
 var myCardList;
+var header;
 
 window.onload = () => {
+    header = (() => {
+        return new Vue({
+            el: '#header',
+            data: {
+                isGameOver: false
+            }
+        });
+    });
+
     startGameButton = (() => {
 
         return new Vue({
@@ -60,6 +70,13 @@ window.onload = () => {
                             myCardList.myTurn = false;
                         });
                     }
+                },
+                stay: function() {
+                    if(myCardList.myTurn) {
+                        axios.post('/api/games/' + gameName + '/stay', {}).then(response => {
+                            myCardList.myTurn = false;
+                        });
+                    }
                 }
             }
         });
@@ -87,6 +104,7 @@ window.onload = () => {
                 playerList.players = response.data.players;
                 myCardList.cards = response.data.myCards;
                 myCardList.myTurn = response.data.myTurn;
+                header.isGameOver = response.data.isGameOver;
             });
         }, 1000);
     });
