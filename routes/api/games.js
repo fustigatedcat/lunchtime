@@ -88,13 +88,12 @@ router.get('/:name', function(req, res) {
             return res.status(404).send();
         }
         var myPlayer = game.players.filter(function(p) { return p._id.equals(req.user._id); });
-        var cardName = '';
         var rtn = {
             isGameStarted: game.started == 0 ? false : game.started,
             players: game.players,
             myCards: myPlayer.length == 0 ? [] : myPlayer[0].cards, // Need to populate this.
             myTurn: myPlayer.length == 0 ? false : myPlayer[0].is_turn,
-            currentCardName: cardName
+            currentCard: game.currentCard
         };
         if(req.query.state == 'initial') {
             gameDAO.addUserToGame(game, req.user, function(err, _) {
@@ -122,6 +121,32 @@ router.get('/:name', function(req, res) {
 
 // Convert this!
 router.post('/:name/play', function(req, res) {
+    gameDAO.getGame(req.params.name, function(err, game) {
+        var myPlayer = game.players.filter(function(p) { return p._id.equals(req.user._id); });
+        if(myPlayer.length != 1) {
+            return res.status(404).send();
+        }
+        myPlayer.cards = myPlayer[0].cards.splice(myPlayer[0].cards.indexOf(req.body.card), 1);
+        game.currentCard = req.body.card;
+        var currentIndex = 0;
+        for(var i = 0; i < game.players.length; i++) {
+            if(game.players[i].is_turn) { currentIndex = i; }
+            game.players[i].is_turn = false;
+        }
+        var nextPlayer = false;
+        while(!nextPlayer) {
+            currentIndex = currentIndex + 1;
+            if(game.players[currentIndex%game.players.length].cards.length > 0) {
+                nextPlayer = true;
+                game.players[currentIndex%game.players.length].is_turn = true;
+            }
+        }
+
+        gameDAO.updateGame(game, function(err) {
+            if(err) { return res.status(500).send(); }
+            res.status(200).send();
+        });
+    });
 });
 
 module.exports = router;

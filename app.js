@@ -38,7 +38,6 @@ app.use(function(req, res, next) {
     next();
   }
 }, function(req, res, next) {
-  console.log(req.lunchtime.uuid);
   userDAO.getUser(req.lunchtime.uuid, function(err, user) {
     if(user == null) {
       req.lunchtime.reset();

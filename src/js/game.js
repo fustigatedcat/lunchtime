@@ -51,9 +51,9 @@ window.onload = () => {
             },
             methods: {
                 play: function(card) {
-                    if(myTurn) {
+                    if(myCardList.myTurn) {
                         axios.post('/api/games/' + gameName + '/play', {
-                            card: card.id
+                            card: card
                         }).then(response => {
                             currentCard.name = card.name;
                             myCardList.cards = myCardList.cards.filter(f => f.id != card.id);
@@ -73,7 +73,7 @@ window.onload = () => {
         if(response.data.isOwner) {
             startGameButton.isDisabled = response.data.isGameStarted;
         }
-        currentCard.name = response.data.currentCardName;
+        currentCard.name = response.data.currentCard;
         playerList.players = response.data.players;
         myCardList.cards = response.data.myCards;
         myCardList.myTurn = response.data.myTurn;
@@ -83,7 +83,7 @@ window.onload = () => {
                     state: 'update'
                 }
             }).then(response => {
-                currentCard.name = response.data.currentCardName;
+                currentCard.name = response.data.currentCard;
                 playerList.players = response.data.players;
                 myCardList.cards = response.data.myCards;
                 myCardList.myTurn = response.data.myTurn;
