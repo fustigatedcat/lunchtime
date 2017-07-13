@@ -1,11 +1,5 @@
-var startGameButton;
-var playerList;
-var currentCard;
-var myCardList;
-var header;
-
 window.onload = () => {
-    header = (() => {
+    var header = (() => {
         return new Vue({
             el: '#header',
             data: {
@@ -14,7 +8,7 @@ window.onload = () => {
         });
     })();
 
-    startGameButton = (() => {
+    var startGameButton = (() => {
 
         return new Vue({
             el: '#start-game-button',
@@ -34,7 +28,7 @@ window.onload = () => {
         });
     })();
 
-    currentCard = (() => {
+    var currentCard = (() => {
         return new Vue({
             el: '#current-card',
             data: {
@@ -43,7 +37,7 @@ window.onload = () => {
         })
     })();
 
-    playerList = (() => {
+    var playerList = (() => {
         return new Vue({
             el: '#player-list',
             data: {
@@ -52,7 +46,7 @@ window.onload = () => {
         });
     })();
 
-    myCardList = (() => {
+    var myCardList = (() => {
         return new Vue({
             el: '#my-cards',
             data: {

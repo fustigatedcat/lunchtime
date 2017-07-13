@@ -1,9 +1,5 @@
-var restaurantSelections;
-var timeSelection;
-var createGameButton;
-
 window.onload = () => {
-    restaurantSelections = (() => {
+    var restaurantSelections = (() => {
         var restaurants = localStorage.getItem('game-restaurants');
         if (restaurants == null) {
             restaurants = [];
@@ -15,23 +11,47 @@ window.onload = () => {
             el: '#restaurant-management',
             data: {
                 restaurants: restaurants,
-                newName: ''
+                newName: '',
+                autoPopulateEnabled: 'geolocation' in navigator,
+                maxAutoPopulate: 10
             },
             methods: {
-                addRestaurant: function() {
+                addRestaurant: () => {
                     restaurantSelections.restaurants.push({name: restaurantSelections.newName});
                     restaurantSelections.newName = '';
                     localStorage.setItem('game-restaurants', JSON.stringify(restaurantSelections.restaurants));
                 },
-                removeRestaurant: function(r) {
+                removeRestaurant: r => {
                     restaurantSelections.restaurants = restaurantSelections.restaurants.filter(r2 => r2 != r);
                     localStorage.setItem('game-restaurants', JSON.stringify(restaurantSelections.restaurants));
+                },
+                autoPopulate: () => {
+                    navigator.geolocation.getCurrentPosition(p => {
+                        var position = {lat: p.coords.latitude, lng: p.coords.longitude};
+                        var nonDisplayedMap = new google.maps.Map(document.createElement('div'), {
+                            center: position,
+                            zoom: 17
+                        });
+                        var service = new google.maps.places.PlacesService(nonDisplayedMap);
+                        service.nearbySearch({
+                            location: position,
+                            radius: 500,
+                            openNow: true,
+                            types: ['restaurant']
+                        }, function(restaurants) {
+                            restaurantSelections.restaurants = restaurants.splice(0, restaurantSelections.maxAutoPopulate);
+                            localStorage.setItem('game-restaurants', JSON.stringify(restaurantSelections.restaurants));
+                        });
+
+                    }, function(e) {
+                        alert(e);
+                    });
                 }
             }
         })
     })();
 
-    timeSelection = (() => {
+    var timeSelection = (() => {
         return new Vue({
             el: '#lunch-time',
             data: {
@@ -41,7 +61,7 @@ window.onload = () => {
         });
     })();
 
-    createGameButton = (() => {
+    var createGameButton = (() => {
         return new Vue({
             el: '#create-game-footer',
             data: {},
