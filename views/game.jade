@@ -8,17 +8,18 @@ block head
 block content
     section(class='row')
         div(class='col-lg-3', id='start-game-button')
-            button(class='btn btn-primary', ':disabled'='isDisabled', 'v-on:click'='startGame') Start Game
+            button(class='btn btn-primary hidden-xs hidden-sm', ':disabled'='isDisabled', 'v-on:click'='startGame') Start Game
+            button(class='btn btn-primary btn-lg hidden-md hidden-lg', ':disabled'='isDisabled', 'v-on:click'='startGame') Start Game
         div(class='col-lg-6 text-center', id='header')
             h1= 'Lunch Time [' + game.time.hour + ':' + game.time.minute + ']'
                 br
                 span(class='text-danger', v-if='isGameOver') Game Over!
-        div(class='col-lg-3 text-right')
+        div(class='col-lg-3 text-right hidden-xs hidden-sm')
             p Link Share
             span= 'http://lunchtime.fustigatedcat.com/games/' + game.name
     section(class='row')
-        div(class='col-lg-5')
-        div(class='col-lg-5')
+        div(class='col-lg-5 hidden-xs hidden-sm')
+        div(class='col-lg-5 col-sm-8')
             section(class='row', id='current-card')
                 h2 Current Card
                 div(class='card')
@@ -30,9 +31,11 @@ block content
                     span(v-if='!myTurn') Wait...
                 div(class='card pull-left', v-for='card in cards', 'v-on:click'='play(card)')
                     h4 {{card}}
-                button(class='btn btn-info', 'v-on:click'='stay()', ':disabled'='!myTurn') Stay
+                span &nbsp;
+                button(class='btn btn-info hidden-xs hidden-sm', 'v-on:click'='stay()', ':disabled'='!myTurn') Stay
+                button(class='btn btn-info btn-lg hidden-md hidden-lg', 'v-on:click'='stay()', ':disabled'='!myTurn') Stay
                 div(class='clearfix')
-        div(class='col-lg-2 text-right', id='player-list')
+        div(class='col-lg-2 col-sm-4 text-right', id='player-list')
             h3 Players
             hr
             div(v-for='player in players')
