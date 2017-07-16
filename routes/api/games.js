@@ -96,7 +96,7 @@ router.get('/:name', function(req, res) {
             myTurn: myPlayer.length == 0 ? false : myPlayer[0].is_turn,
             currentCard: game.currentCard
         };
-        if(req.query.state == 'initial') {
+        if(req.query.state == 'initial' && !game.started) {
             gameDAO.addUserToGame(game, req.user, function(err, _) {
                 if(err) {
                     console.log(err);

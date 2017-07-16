@@ -13,7 +13,8 @@ window.onload = () => {
                 restaurants: restaurants,
                 newName: '',
                 autoPopulateEnabled: 'geolocation' in navigator,
-                maxAutoPopulate: 10
+                maxAutoPopulate: 10,
+                isLoading: false
             },
             methods: {
                 addRestaurant: () => {
@@ -26,6 +27,7 @@ window.onload = () => {
                     localStorage.setItem('game-restaurants', JSON.stringify(restaurantSelections.restaurants));
                 },
                 autoPopulate: () => {
+                    restaurantSelections.isLoading = true;
                     navigator.geolocation.getCurrentPosition(p => {
                         var position = {lat: p.coords.latitude, lng: p.coords.longitude};
                         var nonDisplayedMap = new google.maps.Map(document.createElement('div'), {
@@ -35,15 +37,24 @@ window.onload = () => {
                         var service = new google.maps.places.PlacesService(nonDisplayedMap);
                         service.nearbySearch({
                             location: position,
-                            radius: 500,
+                            //radius: 8047,
+                            rankBy: google.maps.places.RankBy.DISTANCE,
                             openNow: true,
                             types: ['restaurant']
                         }, function(restaurants) {
-                            restaurantSelections.restaurants = restaurants.splice(0, restaurantSelections.maxAutoPopulate);
+                            var deduplicated = [];
+                            restaurants.forEach(r => {
+                                if(deduplicated.filter(r2 => r2.name === r.name).length == 0) {
+                                    deduplicated.push(r);
+                                }
+                            });
+                            restaurantSelections.restaurants = deduplicated.splice(0, restaurantSelections.maxAutoPopulate);
                             localStorage.setItem('game-restaurants', JSON.stringify(restaurantSelections.restaurants));
+                            restaurantSelections.isLoading = false;
                         });
 
                     }, function(e) {
+                        restaurantSelections.isLoading = false;
                         alert(e);
                     });
                 }

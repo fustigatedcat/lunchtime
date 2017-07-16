@@ -7,9 +7,14 @@ block head
 
 block content
   section(class='row')
-    h1 LunchTime
-    p The fun way to solve the lunch debate
-    button(class='btn btn-primary' data-toggle='modal' data-target='#bs-example-modal-sm') New Game
+    div(class='hidden-xs hidden-sm')
+      h1 LunchTime
+      p The fun way to solve the lunch debate
+      button(class='btn btn-primary' data-toggle='modal' data-target='#bs-example-modal-sm') New Game
+    div(class='hidden-md hidden-lg col-lg-12 text-center')
+      h1(class='large') LunchTime
+      p(class='lead') The fun way to solve the lunch debate
+      button(class='btn btn-primary btn-lg' data-toggle='modal' data-target='#bs-example-modal-sm') New Game
     section(id='bs-example-modal-sm' class='modal fade' tabindex='-1' role='dialog' aria-labelledby='mySmallModalLabel')
       div(class="modal-dialog modal-md" role="document")
         div(class='modal-content')
@@ -23,6 +28,7 @@ block content
                   span Max
                   input(type='number', min='1', max='20', style='width: 50px;', v-model='maxAutoPopulate')
                   button(class='btn btn-info', 'v-on:click'='autoPopulate') Auto-Populate
+                  span(v-if='isLoading') Loading
                 div
                   input(type="text", v-model='newName')
                   button(class='btn btn-success', 'v-on:click'='addRestaurant') Add
